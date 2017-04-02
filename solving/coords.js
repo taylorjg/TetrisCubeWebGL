@@ -18,4 +18,8 @@ export class Coords {
             this.y - other.y,
             this.z - other.z);
     }
+
+    equals(other) {
+        return this.x === other.x && this.y === other.y && this.z === other.z;
+    }
 }

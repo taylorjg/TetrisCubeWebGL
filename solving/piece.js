@@ -5,16 +5,14 @@ export class Piece {
     constructor(initStrings, colour, name) {
         this.colour = colour;
         this.name = name;
-        this.width = initStrings[0][0].length;
-        this.height = initStrings[0].length;
-        this.depth = initStrings.length;
+        this.width = initStrings[0].length;
+        this.height = initStrings.length;
+        this.depth = 1;
         this.occupiedSquares = [];
-        for (x of range(this.width)) {
-            for (y of range(this.height)) {
-                for (z of range(this.depth)) {
-                    if (initStrings[z][this.height - y - 1][x] === 'X') {
-                        this.occupiedSquares.push(new Coords(x, y, z));
-                    }
+        for (let x of range(this.width)) {
+            for (let y of range(this.height)) {
+                if (initStrings[this.height - y - 1][x] === 'X') {
+                    this.occupiedSquares.push(new Coords(x, y, 0));
                 }
             }
         }
