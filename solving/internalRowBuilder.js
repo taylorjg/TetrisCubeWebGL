@@ -1,6 +1,7 @@
 import { InternalRow } from './internalRow';
 import { PlacedPiece } from './placedPiece';
 import { Coords } from './coords';
+import { uniqueRotationsOfPiece } from './uniqueRotations';
 
 export const buildInternalRows = puzzle => {
 
@@ -29,7 +30,7 @@ export const buildInternalRows = puzzle => {
 };
 
 const isPlacedPieceWithinPuzzle = (placedPiece, puzzle) =>
-    placedPiece.occupiedSquares.every(coords => isCoordsWithinPuzzle(coords));
+    placedPiece.occupiedSquares.every(coords => isCoordsWithinPuzzle(coords, puzzle));
 
 const isCoordsWithinPuzzle = (coords, puzzle) =>
     isDimensionWithinPuzzle(coords.x, puzzle) &&

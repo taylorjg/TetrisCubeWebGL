@@ -1,4 +1,4 @@
-import { Coords } from './Coords';
+import { Coords } from './coords';
 
 export class Matrix {
     constructor(
@@ -40,7 +40,7 @@ export class Matrix {
     }
 }
 
-export const MAXTRIX_IDENTITY = new Matrix(
+export const MATRIX_IDENTITY = new Matrix(
     1, 0, 0,
     0, 1, 0,
     0, 0, 1

@@ -2,18 +2,6 @@ import { Coords } from './coords';
 import * as C from './constants';
 import * as M from './matrix';
 
-export class RotatedPiece {
-    constructor(piece, rotations) {
-        const rotationMatrix = calculateRotationMatrix(rotations);
-        const correctionFactor = calculateCorrectionFactor(piece, rotationMatrix);
-        this.name = piece.name;
-        this.colour = piece.colour;
-        this.occupiedSquares = piece.occupiedSquares
-            .map(coords => rotationMatrix.multiplyCoords(coords))
-            .map(coords => coords.subtract(correctionFactor));
-    }
-}
-
 const ROTATION_TO_MATRIX = {
     [C.ROTATION_X90CW]: M.MATRIX_X90CW,
     [C.ROTATION_X180CW]: M.MATRIX_X180CW,
@@ -26,9 +14,9 @@ const ROTATION_TO_MATRIX = {
     [C.ROTATION_Z270CW]: M.MATRIX_Z270CW
 };
 
-const calculateRotationMatrix = rotations => 
-    rotations.reduce((acc, rotation) =>
-        acc.multiplyMatrix(ROTATION_TO_MATRIX[rotation]),
+const calculateRotationMatrix = rotations =>
+    rotations.reduce(
+        (acc, rotation) => acc.multiplyMatrix(ROTATION_TO_MATRIX[rotation]),
         M.MATRIX_IDENTITY);
 
 const calculateCorrectionFactor = (piece, rotationMatrix) => {
@@ -39,3 +27,15 @@ const calculateCorrectionFactor = (piece, rotationMatrix) => {
     const zCorrection = Math.min(transformedDimensions.z, 0);
     return new Coords(xCorrection, yCorrection, zCorrection);
 };
+
+export class RotatedPiece {
+    constructor(piece, rotations) {
+        const rotationMatrix = calculateRotationMatrix(rotations);
+        const correctionFactor = calculateCorrectionFactor(piece, rotationMatrix);
+        this.name = piece.name;
+        this.colour = piece.colour;
+        this.occupiedSquares = piece.occupiedSquares
+            .map(coords => rotationMatrix.multiplyCoords(coords))
+            .map(coords => coords.subtract(correctionFactor));
+    }
+}
