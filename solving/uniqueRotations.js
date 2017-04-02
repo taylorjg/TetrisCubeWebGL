@@ -22,20 +22,20 @@ const SETS_OF_ROTATIONS = [
     [C.ROTATION_Y180CW],
     [C.ROTATION_Z270CW],
     [C.ROTATION_Z270CW],
-    [C.ROTATION_Z270CW],
+    [C.ROTATION_Z270CW]
 ];
 
 const rotatedPieceWithSameOccupiedSquaresExists = (result, rotatedPiece) => {
     const occupiedSquares1 = rotatedPiece.occupiedSquares.sort(compareCoords);
-    return result.findIndex(element => {
+    return !!result.find(element => {
         const occupiedSquares2 = element.occupiedSquares.sort(compareCoords);
         return (
-            (occupiedSquares1.length === occupiedSquares2.length) &&
+            occupiedSquares1.length === occupiedSquares2.length &&
             occupiedSquares1.every((coords1, index) => {
                 const coords2 = occupiedSquares2[index];
                 return coords1.equals(coords2);
             }));
-    }) >= 0;
+    });
 };
 
 const compareCoords = (a, b) => {
