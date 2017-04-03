@@ -2,13 +2,15 @@ import { solve } from '../solving';
 
 let searchStepCount = 0;
 
-const onSearchStep = (internalRows, rowIndices) => {
-    console.log(`[onSearchStep] searchStepCount: ${searchStepCount}; rowIndices: ${JSON.stringify(rowIndices)}`);
+const onSearchStep = (puzzle, internalRows) => {
+    console.log(`[onSearchStep] searchStepCount: ${searchStepCount}`);
     searchStepCount++;
 };
 
-const onSolutionFound = (internalRows, rowIndices) => {
-    console.log(`[onSolutionFound] rowIndices: ${JSON.stringify(rowIndices)}`);
+const onSolutionFound = (puzzle, internalRows) => {
+    console.log(`[onSolutionFound]`);
+    internalRows.forEach((internalRow, index) =>
+        console.log(`[${index}]: ${internalRow.name}; ${JSON.stringify(internalRow.occupiedSquares)}`));
 };
 
 const solutionGenerator = solve(onSearchStep, onSolutionFound);

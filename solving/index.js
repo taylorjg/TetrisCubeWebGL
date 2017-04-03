@@ -3,20 +3,23 @@ import { buildInternalRows } from './internalRowBuilder';
 import { buildDlxMatrix } from './dlxMatrixBuilder';
 import dlxSolve from '../dlxlib';
 
-const internalOnSearchStep = (onSearchStep, internalRows) =>
-    rowIndices => onSearchStep(internalRows, rowIndices);
+export * from './colours';
 
-const internalOnSolutionFound = (onSolutionFound, internalRows) =>
-    rowIndices => onSolutionFound(internalRows, rowIndices);
-
-const noop = () => {};
-    
 export const solve = (onSearchStep, onSolutionFound) => {
     const puzzle = new Puzzle;
     const internalRows = buildInternalRows(puzzle);
     const dlxMatrix = buildDlxMatrix(puzzle, internalRows);
     return dlxSolve(
         dlxMatrix,
-        internalOnSearchStep(onSearchStep || noop, internalRows),
-        internalOnSolutionFound(onSolutionFound || noop, internalRows));
+        onSearchStep ? internalOnSearchStep(onSearchStep, puzzle, internalRows) : undefined,
+        onSolutionFound ? internalOnSolutionFound(onSolutionFound, puzzle, internalRows) : undefined);
 };
+
+const internalOnSearchStep = (onSearchStep, puzzle, internalRows) =>
+    rowIndices => onSearchStep(puzzle, lookupRowIndices(puzzle, internalRows, rowIndices));
+
+const internalOnSolutionFound = (onSolutionFound, puzzle, internalRows) =>
+    rowIndices => onSolutionFound(puzzle, lookupRowIndices(puzzle, internalRows, rowIndices));
+
+const lookupRowIndices = (puzzle, internalRows, rowIndices) =>
+    rowIndices.map(rowIndex => internalRows[rowIndex]);

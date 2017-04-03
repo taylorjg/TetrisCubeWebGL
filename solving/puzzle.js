@@ -1,7 +1,7 @@
 import { Piece } from './piece';
 import { range } from './utils';
 import * as S from './shapes';
-import * as C from './constants';
+import * as C from './colours';
 
 const makeAllPieces = () =>
     [].concat(

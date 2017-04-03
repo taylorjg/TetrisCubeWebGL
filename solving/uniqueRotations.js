@@ -1,5 +1,5 @@
 import { RotatedPiece } from './rotatedPiece';
-import * as C from './constants';
+import * as R from './rotations';
 
 export const uniqueRotationsOfPiece = piece => {
     const result = [];
@@ -14,15 +14,15 @@ export const uniqueRotationsOfPiece = piece => {
 
 const SETS_OF_ROTATIONS = [
     [],
-    [C.ROTATION_X90CW],
-    [C.ROTATION_X180CW],
-    [C.ROTATION_X90CW],
-    [C.ROTATION_Y180CW],
-    [C.ROTATION_Y270CW],
-    [C.ROTATION_Y180CW],
-    [C.ROTATION_Z270CW],
-    [C.ROTATION_Z270CW],
-    [C.ROTATION_Z270CW]
+    [R.ROTATION_X90CW],
+    [R.ROTATION_X180CW],
+    [R.ROTATION_X90CW],
+    [R.ROTATION_Y180CW],
+    [R.ROTATION_Y270CW],
+    [R.ROTATION_Y180CW],
+    [R.ROTATION_Z270CW],
+    [R.ROTATION_Z270CW],
+    [R.ROTATION_Z270CW]
 ];
 
 const rotatedPieceWithSameOccupiedSquaresExists = (result, rotatedPiece) => {
