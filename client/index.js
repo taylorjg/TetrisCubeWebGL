@@ -38,7 +38,7 @@ const renderInternalRows = internalRows => {
     const group = new THREE.Group();
     internalRows.forEach((internalRow, index) => createShapeForInternalRow(group, internalRow));
     group.rotation.x = Math.PI / 8;
-    group.rotation.y = Math.PI / 8;
+    group.rotation.y = Math.PI / 4;
     scene.add(group);
     renderer.render(scene, camera);
 };
@@ -51,8 +51,8 @@ renderer.setSize(w, h);
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, w / h, 1, 40);
-camera.position.set(-1, 1.5, 10);
+const camera = new THREE.PerspectiveCamera(31, w / h, 1, 40);
+camera.position.set(0, 2, 12);
 scene.add(camera);
 
 const light = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -65,6 +65,51 @@ const onSolutionFound = (puzzle, internalRows) => {
     internalRows.forEach(internalRow =>
         console.log(`${internalRow.name}; ${JSON.stringify(internalRow.occupiedSquares)}; ${COLOR_TABLE[internalRow.colour]}`));
     renderInternalRows(internalRows);        
+};
+
+const sliderCameraX = document.getElementById('camera_x');
+const sliderCameraY = document.getElementById('camera_y');
+const sliderCameraZ = document.getElementById('camera_z');
+const sliderCameraViewAngle = document.getElementById('camera_va');
+
+sliderCameraX.value = camera.position.x;
+sliderCameraY.value = camera.position.y;
+sliderCameraZ.value = camera.position.z;
+sliderCameraViewAngle.value = camera.fov;
+
+sliderCameraX.addEventListener('change', ev => {
+    updateCameraPos(pos => pos.x = Number(ev.target.value));
+});
+
+sliderCameraY.addEventListener('change', ev => {
+    updateCameraPos(pos => pos.y = Number(ev.target.value));
+});
+
+sliderCameraZ.addEventListener('change', ev => {
+    updateCameraPos(pos => pos.z = Number(ev.target.value));
+});
+
+sliderCameraViewAngle.addEventListener('change', ev => {
+    updateCameraFov(Number(ev.target.value));
+});
+
+const updateCameraPos = fn => {
+    const pos = camera.position;
+    fn(pos);
+    console.log(`pos: ${JSON.stringify(pos)}`);
+    camera.position.set(pos.x, pos.y, pos.z);
+    window.requestAnimationFrame(() => {
+        renderer.render(scene, camera);
+    });
+};
+
+const updateCameraFov = fov => {
+    console.log(`fov: ${fov}`);
+    camera.fov = fov;
+    camera.updateProjectionMatrix();
+    window.requestAnimationFrame(() => {
+        renderer.render(scene, camera);
+    });
 };
 
 const solutionGenerator = solve(null, onSolutionFound);
