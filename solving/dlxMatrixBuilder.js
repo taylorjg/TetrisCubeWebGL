@@ -1,5 +1,3 @@
-import { DlxRow } from './dlxRow';
-
 export const buildDlxMatrix = (puzzle, internalRows) => {
     const dictionary = buildDictionary(puzzle.pieces);
     return internalRows.map(internalRow => buildDlxRow(puzzle, dictionary, internalRow));
@@ -24,5 +22,5 @@ const buildDlxRow = (puzzle, dictionary, internalRow) => {
             occupiedSquare.z * puzzle.cubeSizeSquared;
         bits[occupiedSquareIndex] = 1;
     });
-    return new DlxRow(bits, internalRow);
+    return bits;
 };
