@@ -3,9 +3,9 @@ import * as SOLVING from '../solving';
 import * as THREE from 'THREE';
 
 const COLOR_TABLE = {
-    [SOLVING.COLOUR_BLUE]: 'cyan',
+    [SOLVING.COLOUR_BLUE]: 'deepskyblue',
     [SOLVING.COLOUR_CERISE]: 'deeppink',
-    [SOLVING.COLOUR_GREEN]: 'green',
+    [SOLVING.COLOUR_GREEN]: 'limegreen',
     [SOLVING.COLOUR_MAGENTA]: 'magenta',
     [SOLVING.COLOUR_ORANGE]: 'orange',
     [SOLVING.COLOUR_RED]: 'orangered',
@@ -14,7 +14,10 @@ const COLOR_TABLE = {
 
 const createCube = (group, color, coords) => {
     const geometry = new THREE.CubeGeometry(1, 1, 1);
-    const cube = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color }));
+    const cube = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+        color,
+        opacity: 1,
+        transparent: true }));
     cube.position.x = coords.x;
     cube.position.y = coords.y;
     cube.position.z = -coords.z;
