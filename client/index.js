@@ -1,6 +1,6 @@
 import { solve } from '../solving';
 import * as SOLVING from '../solving';
-import * as THREE from 'THREE';
+import * as THREE from 'three';
 
 const COLOUR_TABLE = {
     [SOLVING.COLOUR_BLUE]: 'deepskyblue',
