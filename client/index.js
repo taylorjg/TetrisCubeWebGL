@@ -36,42 +36,33 @@ const createShapeGroup = internalRow => {
     return shapeGroup;
 };
 
-const currentShapeGroups = {};
-
-const addPair = pair => {
+const addShapeGroup = pair => {
     const { rowIndex, internalRow } = pair;
     const shapeGroup = createShapeGroup(internalRow);
-    currentShapeGroups[rowIndex] = shapeGroup;
+    shapeGroup.userData = rowIndex;
     puzzleGroup.add(shapeGroup);
 };
 
-const removeRowIndex = rowIndex => {
-    const shapeGroup = currentShapeGroups[rowIndex];
-    delete currentShapeGroups[rowIndex];
-    puzzleGroup.remove(shapeGroup);
+const removeShapeGroup = rowIndex => {
+    const shapeGroup = findShapeGroup(rowIndex);
+    shapeGroup && puzzleGroup.remove(shapeGroup);
 };
+
+const findShapeGroup = rowIndex =>
+    puzzleGroup.children.find(shapeGroup => shapeGroup.userData === rowIndex);
 
 const renderPairs = pairs => {
 
-    const pairsToAdd = [];
-    const rowIndicesToRemove = [];
+    pairs
+        .filter(pair => !findShapeGroup(pair.rowIndex))
+        .forEach(addShapeGroup);
 
-    pairs.forEach(pair => {
-        if (!currentShapeGroups[pair.rowIndex]) {
-            pairsToAdd.push(pair);
-        }
-    });
+    puzzleGroup.children
+        .map(child => child.userData)
+        .filter(rowIndex => !pairs.find(pair => pair.rowIndex === rowIndex))
+        .forEach(removeShapeGroup);
 
-    for (let rowIndex in currentShapeGroups) {
-        if (!pairs.find(pair => pair.rowIndex === Number(rowIndex))) {
-            rowIndicesToRemove.push(rowIndex);
-        }
-    }
-
-    pairsToAdd.forEach(pair => addPair(pair));
-    rowIndicesToRemove.forEach(rowIndex => removeRowIndex(rowIndex));
-
-    myRender();
+    render();
 }
 
 const container = document.getElementById('container');
@@ -95,13 +86,13 @@ puzzleGroup.rotation.x = Math.PI / 8;
 puzzleGroup.rotation.y = Math.PI / 4;
 scene.add(puzzleGroup);
 
-const myRender = () => {
+const render = () => {
     window.requestAnimationFrame(() => {
         renderer.render(scene, camera);
     });
 };
 
-myRender();
+render();
 
 const sliderCameraX = document.getElementById('camera_x');
 const sliderCameraY = document.getElementById('camera_y');
@@ -134,14 +125,14 @@ const updateCameraPos = fn => {
     fn(pos);
     console.log(`pos: ${JSON.stringify(pos)}`);
     camera.position.set(pos.x, pos.y, pos.z);
-    myRender();
+    render();
 };
 
 const updateCameraFov = fov => {
     console.log(`fov: ${fov}`);
     camera.fov = fov;
     camera.updateProjectionMatrix();
-    myRender();
+    render();
 };
 
 const onQueueTimer = () => {
@@ -155,7 +146,7 @@ const onQueueTimer = () => {
 };
 
 const queue = [];
-const queueTimer = setInterval(onQueueTimer, 50);
+const queueTimer = setInterval(onQueueTimer, 1000 / 60);
 
 const onSearchStep = pairs => {
     pairs.final = false;
