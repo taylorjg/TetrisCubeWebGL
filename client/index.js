@@ -21,45 +21,56 @@ const createCube = (colour, position) => {
     }));
     cube.position.x = position.x;
     cube.position.y = position.y;
-    cube.position.z = -position.z;
+    cube.position.z = position.z;
     return cube;
 };
 
 const createCubes = (colour, positions) =>
     positions.map(position => createCube(colour, position));
 
-const createCubeGroup = internalRow => {
-    const cubeGroup = new THREE.Group();
+const createShapeGroup = internalRow => {
+    const shapeGroup = new THREE.Group();
     const colour = COLOUR_TABLE[internalRow.colour];
     const cubes = createCubes(colour, internalRow.occupiedSquares);
-    cubes.forEach(cube => cubeGroup.add(cube));
-    return cubeGroup;
+    cubes.forEach(cube => shapeGroup.add(cube));
+    return shapeGroup;
 };
 
-const currentCubeGroups = {};
+const currentShapeGroups = {};
 
 const addPair = pair => {
     const { rowIndex, internalRow } = pair;
-    const cubeGroup = createCubeGroup(internalRow);
-    currentCubeGroups[rowIndex] = cubeGroup;
-    puzzleGroup.add(cubeGroup);
+    const shapeGroup = createShapeGroup(internalRow);
+    currentShapeGroups[rowIndex] = shapeGroup;
+    puzzleGroup.add(shapeGroup);
 };
 
-const removePair = pair => {
-    const { rowIndex, internalRow } = pair;
-    const cubeGroup = currentCubeGroups[rowIndex];
-    currentCubeGroups.delete(rowIndex);
-    puzzleGroup.remove(cubeGroup);
+const removeRowIndex = rowIndex => {
+    const shapeGroup = currentShapeGroups[rowIndex];
+    delete currentShapeGroups[rowIndex];
+    puzzleGroup.remove(shapeGroup);
 };
 
 const renderPairs = pairs => {
-    const pairsToAdd = pairs;
-    const pairsToRemove = [];
-    // TODO: need to determine:
-    // - pairs to add
-    // - pairs to remove
+
+    const pairsToAdd = [];
+    const rowIndicesToRemove = [];
+
+    pairs.forEach(pair => {
+        if (!currentShapeGroups[pair.rowIndex]) {
+            pairsToAdd.push(pair);
+        }
+    });
+
+    for (let rowIndex in currentShapeGroups) {
+        if (!pairs.find(pair => pair.rowIndex === Number(rowIndex))) {
+            rowIndicesToRemove.push(rowIndex);
+        }
+    }
+
     pairsToAdd.forEach(pair => addPair(pair));
-    pairsToRemove.forEach(pair => removePair(pair));
+    rowIndicesToRemove.forEach(rowIndex => removeRowIndex(rowIndex));
+
     myRender();
 }
 
@@ -133,18 +144,22 @@ const updateCameraFov = fov => {
     myRender();
 };
 
-const queue = [];
-const queueTimer = setInterval(onQueueTimer, 100);
-
 const onQueueTimer = () => {
     if (queue.length) {
         const pairs = queue.shift();
         renderPairs(pairs);
+        if (pairs.final) {
+            clearInterval(queueTimer);
+        }
     }
 };
 
+const queue = [];
+const queueTimer = setInterval(onQueueTimer, 50);
+
 const onSearchStep = pairs => {
-    // queue.push(pairs);
+    pairs.final = false;
+    queue.push(pairs);
 };
 
 const onSolutionFound = pairs => {
@@ -155,7 +170,8 @@ const onSolutionFound = pairs => {
         const colourName = COLOUR_TABLE[internalRow.colour];
         console.log(`${rowIndex} ${name}; ${occupiedSquares}; ${colourName}`);
     });
-    renderPairs(pairs);
+    pairs.final = true;
+    queue.push(pairs);
 };
 
 const solutionGenerator = solve(onSearchStep, onSolutionFound);
