@@ -8,23 +8,39 @@
 </head>
 
 <body>
-    <div id="container"></div>
-    <div id="panel">
-        <div>
-            <label for="camera_x">Camera X</label>
-            <input id="camera_x" type="range" min="-15" max="15">
+    <div class="container fillHeight">
+        <div class="row">
+            <div class="col-md-12">
+                <span class="pull-right"><i>version: <%= htmlWebpackPlugin.options.version %></i></span>
+            </div>
         </div>
-        <div>
-            <label for="camera_y">Camera Y</label>
-            <input id="camera_y" type="range" min="-15" max="15">
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    <label id="camera_x_label" for="camera_x">Camera X: </label>
+                    <input id="camera_x" type="range" min="-15" max="15">
+                </div>
+                <div>
+                    <label id="camera_y_label" for="camera_y">Camera Y: </label>
+                    <input id="camera_y" type="range" min="-15" max="15">
+                </div>
+                <div>
+                    <label id="camera_z_label" for="camera_z">Camera Z: </label>
+                    <input id="camera_z" type="range" min="-15" max="15">
+                </div>
+                <div>
+                    <label id="camera_va_label" for="camera_va">Camera View Angle: </label>
+                    <input id="camera_va" type="range" min="10" max="90">
+                </div>
+                <div>
+                    <label id="search_step">Search Step: </label>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="camera_z">Camera Z</label>
-            <input id="camera_z" type="range" min="-15" max="15">
-        </div>
-        <div>
-            <label for="camera_va">Camera View Angle</label>
-            <input id="camera_va" type="range" min="10" max="90">
+        <div class="row fillHeight">
+            <div class="col-md-12 fillHeight">
+                <div id="container" class="fillHeight"></div>
+            </div>
         </div>
     </div>
 </body>
