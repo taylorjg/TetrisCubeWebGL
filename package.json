@@ -29,7 +29,8 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "scripts": {
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "heroku-postbuild": "npm install --only=dev && webpack"
   },
   "repository": {
     "type": "git",
