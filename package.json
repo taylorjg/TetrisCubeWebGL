@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "node server/app.js",
-    "heroku-postbuild": "npm install --only=dev && webpack"
+    "heroku-postbuild": "npm install --dev && webpack"
   },
   "repository": {
     "type": "git",
