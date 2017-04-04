@@ -16,10 +16,13 @@ export const solve = (onSearchStep, onSolutionFound) => {
 };
 
 const internalOnSearchStep = (onSearchStep, puzzle, internalRows) =>
-    rowIndices => onSearchStep(puzzle, lookupRowIndices(puzzle, internalRows, rowIndices));
+    rowIndices => onSearchStep(rowIndicesToPairs(puzzle, internalRows, rowIndices));
 
 const internalOnSolutionFound = (onSolutionFound, puzzle, internalRows) =>
-    rowIndices => onSolutionFound(puzzle, lookupRowIndices(puzzle, internalRows, rowIndices));
+    rowIndices => onSolutionFound(rowIndicesToPairs(puzzle, internalRows, rowIndices));
 
-const lookupRowIndices = (puzzle, internalRows, rowIndices) =>
-    rowIndices.map(rowIndex => internalRows[rowIndex]);
+const rowIndicesToPairs = (puzzle, internalRows, rowIndices) =>
+    rowIndices.map(rowIndex => ({
+        rowIndex,
+        internalRow: internalRows[rowIndex]
+    }));
