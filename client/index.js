@@ -87,17 +87,24 @@ renderer.setSize(w, h);
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(54, w / h, 1, 40);
+const camera = new THREE.PerspectiveCamera(34, w / h, 1, 40);
 camera.position.set(2, 1, 10);
 scene.add(camera);
 
-const light = new THREE.DirectionalLight(0xffffff, 1.0);
-light.position.set(0, 0, 5);
-scene.add(light);
+const light1 = new THREE.DirectionalLight(0xffffff, 1.0);
+light1.position.set(0, 0, 5);
+scene.add(light1);
+
+const light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+light2.position.set(0, 0, -5);
+scene.add(light2);
 
 const puzzleGroup = new THREE.Group();
 puzzleGroup.rotation.x = Math.PI / 8;
 puzzleGroup.rotation.y = Math.PI / 4;
+puzzleGroup.position.x = -2;
+puzzleGroup.position.y = -2;
+puzzleGroup.position.z = -2;
 scene.add(puzzleGroup);
 
 const controls = new TrackballControls(camera, renderer.domElement);
@@ -144,6 +151,12 @@ sliderCameraZ.addEventListener('change', ev => {
 sliderCameraViewAngle.addEventListener('change', ev => {
     updateCameraFov(Number(ev.target.value));
     updateSliderCameraViewAngleLabel(ev.target.value);
+});
+
+window.addEventListener('resize', () => {
+    renderer.setSize(container.offsetWidth, container.offsetHeight);
+	camera.aspect = container.offsetWidth / container.offsetHeight;
+	camera.updateProjectionMatrix();
 });
 
 const updateSliderCameraXLabel = () =>
