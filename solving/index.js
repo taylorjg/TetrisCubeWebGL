@@ -1,18 +1,19 @@
 import { Puzzle }  from './puzzle';
 import { buildInternalRows } from './internalRowBuilder';
 import { buildDlxMatrix } from './dlxMatrixBuilder';
-import dlxSolve from '../dlxlib';
+import { solutionGenerator } from 'dlxlib';
 
 export * from './colours';
 
 export const solve = (onSearchStep, onSolutionFound) => {
     const puzzle = new Puzzle;
     const internalRows = buildInternalRows(puzzle);
-    const dlxMatrix = buildDlxMatrix(puzzle, internalRows);
-    return dlxSolve(
-        dlxMatrix,
-        onSearchStep ? internalOnSearchStep(onSearchStep, puzzle, internalRows) : undefined,
-        onSolutionFound ? internalOnSolutionFound(onSolutionFound, puzzle, internalRows) : undefined);
+    const matrix = buildDlxMatrix(puzzle, internalRows);
+    const generator = solutionGenerator(
+        matrix,
+        internalOnSearchStep(onSearchStep, puzzle, internalRows),
+        internalOnSolutionFound(onSolutionFound, puzzle, internalRows));
+    generator.next();
 };
 
 const internalOnSearchStep = (onSearchStep, puzzle, internalRows) =>

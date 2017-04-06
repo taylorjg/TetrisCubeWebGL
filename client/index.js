@@ -214,5 +214,4 @@ const onSolutionFound = pairs => {
     queue.push(pairs);
 };
 
-const solutionGenerator = solve(onSearchStep, onSolutionFound);
-solutionGenerator.next();
+solve(onSearchStep, onSolutionFound);
