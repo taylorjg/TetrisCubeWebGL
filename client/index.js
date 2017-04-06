@@ -1,6 +1,7 @@
 import { solve } from '../solving';
 import * as SOLVING from '../solving';
 import * as THREE from 'three';
+import TrackballControls from 'three-trackballcontrols';
 
 const COLOUR_TABLE = {
     [SOLVING.COLOUR_BLUE]: 'deepskyblue',
@@ -76,8 +77,6 @@ const renderPairs = pairs => {
         .map(child => child.userData)
         .filter(rowIndex => !pairs.find(pair => pair.rowIndex === rowIndex))
         .forEach(removeShapeGroup);
-
-    render();
 }
 
 const container = document.getElementById('container');
@@ -101,13 +100,15 @@ puzzleGroup.rotation.x = Math.PI / 8;
 puzzleGroup.rotation.y = Math.PI / 4;
 scene.add(puzzleGroup);
 
+const controls = new TrackballControls(camera, renderer.domElement);
+
 const render = () => {
-    window.requestAnimationFrame(() => {
-        renderer.render(scene, camera);
-    });
+    controls.update();
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(render);
 };
 
-render();
+window.requestAnimationFrame(render);
 
 const sliderCameraX = document.getElementById('camera_x');
 const sliderCameraY = document.getElementById('camera_y');
@@ -170,14 +171,12 @@ const updateCameraPos = fn => {
     fn(pos);
     console.log(`pos: ${JSON.stringify(pos)}`);
     camera.position.set(pos.x, pos.y, pos.z);
-    render();
 };
 
 const updateCameraFov = fov => {
     console.log(`fov: ${fov}`);
     camera.fov = fov;
     camera.updateProjectionMatrix();
-    render();
 };
 
 let searchStep = 0;
@@ -195,7 +194,6 @@ const onQueueTimer = () => {
 
 const queue = [];
 const queueTimer = setInterval(onQueueTimer, 100);
-
 
 const onSearchStep = pairs => {
     pairs.final = false;
