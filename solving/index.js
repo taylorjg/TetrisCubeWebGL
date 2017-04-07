@@ -1,13 +1,17 @@
 import { Puzzle }  from './puzzle';
 import { buildInternalRows } from './internalRowBuilder';
 import { buildDlxMatrix } from './dlxMatrixBuilder';
+import { shuffle } from './utils';
 import { solutionGenerator } from 'dlxlib';
 
 export * from './colours';
+export * from './rotations';
+
+export const puzzle = new Puzzle;
 
 export const solve = (onSearchStep, onSolutionFound) => {
-    const puzzle = new Puzzle;
     const internalRows = buildInternalRows(puzzle);
+    shuffle(internalRows);
     const matrix = buildDlxMatrix(puzzle, internalRows);
     const generator = solutionGenerator(
         matrix,

@@ -1,7 +1,15 @@
-import { solve } from '../solving';
+import { puzzle, solve } from '../solving';
 import * as SOLVING from '../solving';
 import * as THREE from 'three';
 import TrackballControls from 'three-trackballcontrols';
+
+const createMesh = colour => {
+    return new THREE.MeshLambertMaterial({
+        color: colour,
+        opacity: 1,
+        transparent: true
+    })    
+};
 
 const COLOUR_TABLE = {
     [SOLVING.COLOUR_BLUE]: 'deepskyblue',
@@ -11,14 +19,6 @@ const COLOUR_TABLE = {
     [SOLVING.COLOUR_ORANGE]: 'orange',
     [SOLVING.COLOUR_RED]: 'orangered',
     [SOLVING.COLOUR_YELLOW]: 'yellow'
-};
-
-const createMesh = colour => {
-    return new THREE.MeshLambertMaterial({
-        color: colour,
-        opacity: 1,
-        transparent: true
-    })    
 };
 
 const MESH_TABLE = {
@@ -45,23 +45,36 @@ const createCube = (colour, position) => {
 const createCubes = (colour, positions) =>
     positions.map(position => createCube(colour, position));
 
-const createShapeGroup = internalRow => {
+const createShapeGroup = (colour, positions) => {
     const shapeGroup = new THREE.Group();
-    const cubes = createCubes(internalRow.colour, internalRow.occupiedSquares);
+    shapeGroup.userData = -1;
+    const cubes = createCubes(colour, positions);
     cubes.forEach(cube => shapeGroup.add(cube));
     return shapeGroup;
 };
 
+const PIECES = new Map(puzzle.pieces.map(piece => {
+    const shapeGroup = createShapeGroup(piece.colour, piece.occupiedSquares);
+    return [piece.name, shapeGroup];
+}));
+
 const addShapeGroup = pair => {
     const { rowIndex, internalRow } = pair;
-    const shapeGroup = createShapeGroup(internalRow);
+    const shapeGroup = PIECES.get(internalRow.name);
+        shapeGroup.children.forEach((cube, index) => {
+            const position = internalRow.occupiedSquares[index];
+            cube.position.x = position.x;
+            cube.position.y = position.y;
+            cube.position.z = position.z;
+        });
     shapeGroup.userData = rowIndex;
     puzzleGroup.add(shapeGroup);
 };
 
 const removeShapeGroup = rowIndex => {
     const shapeGroup = findShapeGroup(rowIndex);
-    shapeGroup && puzzleGroup.remove(shapeGroup);
+    puzzleGroup.remove(shapeGroup);
+    shapeGroup.userData = -1;
 };
 
 const findShapeGroup = rowIndex =>
@@ -88,7 +101,8 @@ container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, w / h, 1, 40);
-camera.position.set(2, 1, 10);
+camera.position.set(2, 1, 15);
+camera.lookAt(new THREE.Vector3(0, 0, 0));
 scene.add(camera);
 
 const light1 = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -100,11 +114,11 @@ light2.position.set(0, 0, -5);
 scene.add(light2);
 
 const puzzleGroup = new THREE.Group();
+puzzleGroup.position.x = -1.5;
+puzzleGroup.position.y = -1.5;
+puzzleGroup.position.z = -1.5;
 puzzleGroup.rotation.x = Math.PI / 8;
 puzzleGroup.rotation.y = Math.PI / 4;
-puzzleGroup.position.x = -2;
-puzzleGroup.position.y = -2;
-puzzleGroup.position.z = -2;
 scene.add(puzzleGroup);
 
 const controls = new TrackballControls(camera, renderer.domElement);
@@ -115,43 +129,21 @@ const render = () => {
     window.requestAnimationFrame(render);
 };
 
+// const buildAxis = (dst, colour) => {
+//     const geom = new THREE.Geometry();
+//     const mat = new THREE.LineBasicMaterial({ linewidth: 3, color: colour });
+//     geom.vertices.push(new THREE.Vector3(0, 0, 0));
+//     geom.vertices.push(dst.clone());
+//     return new THREE.Line(geom, mat, THREE.LinePieces);
+// };
+// const xAxis = buildAxis(new THREE.Vector3(100, 0, 0), 'red');
+// const yAxis = buildAxis(new THREE.Vector3(0, 100, 0), 'green');
+// const zAxis = buildAxis(new THREE.Vector3(0, 0, 100), 'blue');
+// scene.add(xAxis);
+// scene.add(yAxis);
+// scene.add(zAxis);
+
 window.requestAnimationFrame(render);
-
-const sliderCameraX = document.getElementById('camera_x');
-const sliderCameraY = document.getElementById('camera_y');
-const sliderCameraZ = document.getElementById('camera_z');
-const sliderCameraViewAngle = document.getElementById('camera_va');
-
-const sliderCameraXLabel = document.getElementById('camera_x_label');
-const sliderCameraYLabel = document.getElementById('camera_y_label');
-const sliderCameraZLabel = document.getElementById('camera_z_label');
-const sliderCameraViewAngleLabel = document.getElementById('camera_va_label');
-const searchStepLabel = document.getElementById('search_step');
-
-sliderCameraX.value = camera.position.x;
-sliderCameraY.value = camera.position.y;
-sliderCameraZ.value = camera.position.z;
-sliderCameraViewAngle.value = camera.fov;
-
-sliderCameraX.addEventListener('change', ev => {
-    updateCameraPos(pos => pos.x = Number(ev.target.value));
-    updateSliderCameraXLabel();
-});
-
-sliderCameraY.addEventListener('change', ev => {
-    updateCameraPos(pos => pos.y = Number(ev.target.value));
-    updateSliderCameraYLabel();
-});
-
-sliderCameraZ.addEventListener('change', ev => {
-    updateCameraPos(pos => pos.z = Number(ev.target.value));
-    updateSliderCameraZLabel();
-});
-
-sliderCameraViewAngle.addEventListener('change', ev => {
-    updateCameraFov(Number(ev.target.value));
-    updateSliderCameraViewAngleLabel(ev.target.value);
-});
 
 window.addEventListener('resize', () => {
     renderer.setSize(container.offsetWidth, container.offsetHeight);
@@ -159,44 +151,8 @@ window.addEventListener('resize', () => {
 	camera.updateProjectionMatrix();
 });
 
-const updateSliderCameraXLabel = () =>
-    sliderCameraXLabel.innerText = `Camera X: ${sliderCameraX.value}`;
-
-const updateSliderCameraYLabel = () =>
-    sliderCameraYLabel.innerText = `Camera Y: ${sliderCameraY.value}`;
-
-const updateSliderCameraZLabel = () =>
-    sliderCameraZLabel.innerText = `Camera Z: ${sliderCameraZ.value}`;
-
-const updateSliderCameraViewAngleLabel = () =>
-    sliderCameraViewAngleLabel.innerText = `Camera View Angle: ${sliderCameraViewAngle.value}`;
-
-const updateSearchStepLabel = count =>
-    searchStepLabel.innerText = `Search Step: ${count}`;
-
-updateSliderCameraXLabel();
-updateSliderCameraYLabel();
-updateSliderCameraZLabel();
-updateSliderCameraViewAngleLabel();
-
-const updateCameraPos = fn => {
-    const pos = camera.position;
-    fn(pos);
-    console.log(`pos: ${JSON.stringify(pos)}`);
-    camera.position.set(pos.x, pos.y, pos.z);
-};
-
-const updateCameraFov = fov => {
-    console.log(`fov: ${fov}`);
-    camera.fov = fov;
-    camera.updateProjectionMatrix();
-};
-
-let searchStep = 0;
-
 const onQueueTimer = () => {
     if (queue.length) {
-        updateSearchStepLabel(searchStep++);
         const pairs = queue.shift();
         renderPairs(pairs);
         if (pairs.final) {
@@ -214,13 +170,6 @@ const onSearchStep = pairs => {
 };
 
 const onSolutionFound = pairs => {
-    pairs.forEach(pair => {
-        const { rowIndex, internalRow } = pair;
-        const name = internalRow.name;
-        const occupiedSquares = JSON.stringify(internalRow.occupiedSquares);
-        const colourName = COLOUR_TABLE[internalRow.colour];
-        console.log(`${rowIndex} ${name}; ${occupiedSquares}; ${colourName}`);
-    });
     pairs.final = true;
     queue.push(pairs);
 };
