@@ -1,10 +1,10 @@
 {
   "name": "tetriscube",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "TetrisCube",
   "main": "server/app.js",
   "dependencies": {
-    "dlxlib": "^1.0.2",
+    "dlxlib": "^1.0.3",
     "express": "^4.15.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",

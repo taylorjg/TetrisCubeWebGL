@@ -3,13 +3,12 @@ import * as SOLVING from '../solving';
 import * as THREE from 'three';
 import TrackballControls from 'three-trackballcontrols';
 
-const createMesh = colour => {
-    return new THREE.MeshLambertMaterial({
+const createMesh = colour =>
+    new THREE.MeshLambertMaterial({
         color: colour,
         opacity: 1,
         transparent: true
-    })    
-};
+    })
 
 const COLOUR_TABLE = {
     [SOLVING.COLOUR_BLUE]: 'deepskyblue',
@@ -61,12 +60,12 @@ const PIECES = new Map(puzzle.pieces.map(piece => {
 const addShapeGroup = pair => {
     const { rowIndex, internalRow } = pair;
     const shapeGroup = PIECES.get(internalRow.name);
-        shapeGroup.children.forEach((cube, index) => {
-            const position = internalRow.occupiedSquares[index];
-            cube.position.x = position.x;
-            cube.position.y = position.y;
-            cube.position.z = position.z;
-        });
+    shapeGroup.children.forEach((cube, index) => {
+        const position = internalRow.occupiedSquares[index];
+        cube.position.x = position.x;
+        cube.position.y = position.y;
+        cube.position.z = position.z;
+    });
     shapeGroup.userData = rowIndex;
     puzzleGroup.add(shapeGroup);
 };
@@ -129,26 +128,12 @@ const render = () => {
     window.requestAnimationFrame(render);
 };
 
-// const buildAxis = (dst, colour) => {
-//     const geom = new THREE.Geometry();
-//     const mat = new THREE.LineBasicMaterial({ linewidth: 3, color: colour });
-//     geom.vertices.push(new THREE.Vector3(0, 0, 0));
-//     geom.vertices.push(dst.clone());
-//     return new THREE.Line(geom, mat, THREE.LinePieces);
-// };
-// const xAxis = buildAxis(new THREE.Vector3(100, 0, 0), 'red');
-// const yAxis = buildAxis(new THREE.Vector3(0, 100, 0), 'green');
-// const zAxis = buildAxis(new THREE.Vector3(0, 0, 100), 'blue');
-// scene.add(xAxis);
-// scene.add(yAxis);
-// scene.add(zAxis);
-
-window.requestAnimationFrame(render);
+render();
 
 window.addEventListener('resize', () => {
     renderer.setSize(container.offsetWidth, container.offsetHeight);
-	camera.aspect = container.offsetWidth / container.offsetHeight;
-	camera.updateProjectionMatrix();
+    camera.aspect = container.offsetWidth / container.offsetHeight;
+    camera.updateProjectionMatrix();
 });
 
 const onQueueTimer = () => {
