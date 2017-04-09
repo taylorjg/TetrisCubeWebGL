@@ -1,4 +1,4 @@
-import { puzzle, solve } from '../solving';
+import { solve } from '../solving';
 import * as SOLVING from '../solving';
 import * as THREE from 'three';
 import TrackballControls from 'three-trackballcontrols';
@@ -10,62 +10,58 @@ const createMesh = colour =>
         transparent: true
     })
 
-const COLOUR_TABLE = {
-    [SOLVING.COLOUR_BLUE]: 'deepskyblue',
-    [SOLVING.COLOUR_CERISE]: 'deeppink',
-    [SOLVING.COLOUR_GREEN]: 'limegreen',
-    [SOLVING.COLOUR_MAGENTA]: 'magenta',
-    [SOLVING.COLOUR_ORANGE]: 'orange',
-    [SOLVING.COLOUR_RED]: 'orangered',
-    [SOLVING.COLOUR_YELLOW]: 'yellow'
-};
-
 const MESH_TABLE = {
-    [SOLVING.COLOUR_BLUE]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_BLUE]),
-    [SOLVING.COLOUR_CERISE]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_CERISE]),
-    [SOLVING.COLOUR_GREEN]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_GREEN]),
-    [SOLVING.COLOUR_MAGENTA]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_MAGENTA]),
-    [SOLVING.COLOUR_ORANGE]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_ORANGE]),
-    [SOLVING.COLOUR_RED]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_RED]),
-    [SOLVING.COLOUR_YELLOW]: createMesh(COLOUR_TABLE[SOLVING.COLOUR_YELLOW])
+    [SOLVING.COLOUR_BLUE]: createMesh('deepskyblue'),
+    [SOLVING.COLOUR_CERISE]: createMesh('deeppink'),
+    [SOLVING.COLOUR_GREEN]: createMesh('limegreen'),
+    [SOLVING.COLOUR_MAGENTA]: createMesh('magenta'),
+    [SOLVING.COLOUR_ORANGE]: createMesh('orange'),
+    [SOLVING.COLOUR_RED]: createMesh('orangered'),
+    [SOLVING.COLOUR_YELLOW]: createMesh('yellow')
 };
 
-const SIZE = 0.95;
-const geometry = new THREE.CubeGeometry(SIZE, SIZE, SIZE);
+const GAP = 0.012;
+const HALF_GAP = 0.006;
 
-const createCube = (colour, position) => {
+const isCubeAt = (positions, x, y, z) =>
+    positions.some(pos => pos.x === x && pos.y === y && pos.z === z);
+
+const createCube = (colour, position, positions) => {
+    const leftOpen = !isCubeAt(positions, position.x - 1, position.y, position.z);
+    const rightOpen = !isCubeAt(positions, position.x + 1, position.y, position.z);
+    const topOpen = !isCubeAt(positions, position.x, position.y + 1, position.z);
+    const bottomOpen = !isCubeAt(positions, position.x, position.y - 1, position.z);
+    const frontOpen = !isCubeAt(positions, position.x, position.y, position.z - 1);
+    const backOpen = !isCubeAt(positions, position.x, position.y, position.z + 1);
+    const xSize = 1 - (leftOpen ? GAP : 0) - (rightOpen ? GAP : 0);
+    const ySize = 1 - (topOpen ? GAP : 0) - (bottomOpen ? GAP : 0);
+    const zSize = 1 - (frontOpen ? GAP : 0) - (backOpen ? GAP : 0);
+    const xTranslation = 0 + (leftOpen ? HALF_GAP : 0) - (rightOpen ? HALF_GAP : 0);
+    const yTranslation = 0 - (topOpen ? HALF_GAP : 0) + (bottomOpen ? HALF_GAP : 0);
+    const zTranslation = 0 + (frontOpen ? HALF_GAP : 0) - (backOpen ? HALF_GAP : 0);
+    const geometry = new THREE.CubeGeometry(xSize, ySize, zSize);
     const cube = new THREE.Mesh(geometry, MESH_TABLE[colour]);
     cube.position.x = position.x;
     cube.position.y = position.y;
     cube.position.z = position.z;
+    cube.translateX(xTranslation);
+    cube.translateY(yTranslation);
+    cube.translateZ(zTranslation);
     return cube;
 };
 
 const createCubes = (colour, positions) =>
-    positions.map(position => createCube(colour, position));
+    positions.map(position => createCube(colour, position, positions));
 
 const createShapeGroup = (colour, positions) => {
     const shapeGroup = new THREE.Group();
-    shapeGroup.userData = -1;
     const cubes = createCubes(colour, positions);
     cubes.forEach(cube => shapeGroup.add(cube));
     return shapeGroup;
 };
 
-const PIECES = new Map(puzzle.pieces.map(piece => {
-    const shapeGroup = createShapeGroup(piece.colour, piece.occupiedSquares);
-    return [piece.name, shapeGroup];
-}));
-
-const addShapeGroup = pair => {
-    const { rowIndex, internalRow } = pair;
-    const shapeGroup = PIECES.get(internalRow.name);
-    shapeGroup.children.forEach((cube, index) => {
-        const position = internalRow.occupiedSquares[index];
-        cube.position.x = position.x;
-        cube.position.y = position.y;
-        cube.position.z = position.z;
-    });
+const addShapeGroup = ({ rowIndex, internalRow }) => {
+    const shapeGroup = createShapeGroup(internalRow.colour, internalRow.occupiedSquares);
     shapeGroup.userData = rowIndex;
     puzzleGroup.add(shapeGroup);
 };
@@ -73,7 +69,6 @@ const addShapeGroup = pair => {
 const removeShapeGroup = rowIndex => {
     const shapeGroup = findShapeGroup(rowIndex);
     puzzleGroup.remove(shapeGroup);
-    shapeGroup.userData = -1;
 };
 
 const findShapeGroup = rowIndex =>
@@ -87,7 +82,7 @@ const renderPairs = pairs => {
 
     puzzleGroup.children
         .map(child => child.userData)
-        .filter(rowIndex => !pairs.find(pair => pair.rowIndex === rowIndex))
+        .filter(rowIndex => !pairs.some(pair => pair.rowIndex === rowIndex))
         .forEach(removeShapeGroup);
 }
 
