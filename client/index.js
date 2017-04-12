@@ -39,7 +39,7 @@ const createCube = (colour, position, positions) => {
     const xTranslation = 0 + (leftOpen ? HALF_GAP : 0) - (rightOpen ? HALF_GAP : 0);
     const yTranslation = 0 - (topOpen ? HALF_GAP : 0) + (bottomOpen ? HALF_GAP : 0);
     const zTranslation = 0 + (frontOpen ? HALF_GAP : 0) - (backOpen ? HALF_GAP : 0);
-    const geometry = new THREE.CubeGeometry(xSize, ySize, zSize);
+    const geometry = new THREE.BoxGeometry(xSize, ySize, zSize);
     const cube = new THREE.Mesh(geometry, MESH_TABLE[colour]);
     cube.position.x = position.x;
     cube.position.y = position.y;
@@ -68,6 +68,7 @@ const addShapeGroup = ({ rowIndex, internalRow }) => {
 
 const removeShapeGroup = rowIndex => {
     const shapeGroup = findShapeGroup(rowIndex);
+    shapeGroup.children.forEach(cube => cube.geometry.dispose());
     puzzleGroup.remove(shapeGroup);
 };
 
