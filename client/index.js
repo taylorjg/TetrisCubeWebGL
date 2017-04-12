@@ -96,24 +96,38 @@ container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, w / h, 1, 40);
-camera.position.set(2, 1, 15);
+camera.position.set(3.45, 7.35, 9.40);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 scene.add(camera);
 
-const light1 = new THREE.DirectionalLight(0xffffff, 1.0);
-light1.position.set(0, 0, 5);
+const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+light1.position.set(0, 0, 10);
 scene.add(light1);
 
-const light2 = new THREE.DirectionalLight(0xffffff, 1.0);
-light2.position.set(0, 0, -5);
+const light2 = new THREE.DirectionalLight(0xffffff, 0.8);
+light2.position.set(0, 0, -10);
 scene.add(light2);
+
+const light3 = new THREE.DirectionalLight(0xffffff, 0.8);
+light3.position.set(0, 10, 0);
+scene.add(light3);
+
+const light4 = new THREE.DirectionalLight(0xffffff, 0.4);
+light4.position.set(0, -10, 0);
+scene.add(light4);
+
+const light5 = new THREE.DirectionalLight(0xffffff, 0.4);
+light5.position.set(10, 0, 0);
+scene.add(light5);
+
+const light6 = new THREE.DirectionalLight(0xffffff, 0.4);
+light6.position.set(-10, 0, 0);
+scene.add(light6);
 
 const puzzleGroup = new THREE.Group();
 puzzleGroup.position.x = -1.5;
 puzzleGroup.position.y = -1.5;
 puzzleGroup.position.z = -1.5;
-puzzleGroup.rotation.x = Math.PI / 8;
-puzzleGroup.rotation.y = Math.PI / 4;
 scene.add(puzzleGroup);
 
 const controls = new TrackballControls(camera, renderer.domElement);
