@@ -95,7 +95,7 @@ renderer.setSize(w, h);
 container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(34, w / h, 1, 40);
+const camera = new THREE.PerspectiveCamera(34, w / h, 1, 100);
 camera.position.set(3.45, 7.35, 9.40);
 camera.lookAt(new THREE.Vector3(0, 0, 0));
 scene.add(camera);
@@ -131,6 +131,9 @@ puzzleGroup.position.z = -1.5;
 scene.add(puzzleGroup);
 
 const controls = new TrackballControls(camera, renderer.domElement);
+controls.minDistance = 5.0;
+controls.maxDistance = 40.0;
+controls.noPan = true;
 
 const render = () => {
     controls.update();
