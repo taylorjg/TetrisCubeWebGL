@@ -1,6 +1,6 @@
 {
   "name": "tetriscube",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "TetrisCube",
   "main": "server/app.js",
   "dependencies": {
